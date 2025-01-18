@@ -5,5 +5,9 @@
             "name": "keyword.abs.instractions",
             "match": "\\babs\\b"
         }
-    ]
+    ],
+    "repository": {},
+    "colors": {
+        "keyword.abs.instractions": "#FF5DDD"
+    }
 }
