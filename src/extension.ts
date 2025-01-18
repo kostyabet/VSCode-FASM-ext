@@ -16,11 +16,14 @@ export function activate(context: vscode.ExtensionContext) {
 	const disposable = vscode.commands.registerCommand('fasmext.helloWorld', () => {
 		// The code you place here will be executed every time your command is executed
 		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from vscode-fasm-ext!');
+		vscode.window.showInformationMessage('hello');
 	});
 
-	context.subscriptions.push(disposable);
+	const goidaMessage = vscode.commands.registerCommand('fasmext.goida', () => {
+		vscode.window.showInformationMessage('goida');
+	});
+
+	context.subscriptions.push(disposable, goidaMessage);
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}

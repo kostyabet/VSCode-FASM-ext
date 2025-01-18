@@ -16,6 +16,14 @@
       {
         "command": "fasmext.helloWorld",
         "title": "Hello World"
+      },
+      {
+        "command": "fasmext.goida",
+        "title": "Goida"
+      },
+      {
+        "command": "fasmext.test",
+        "title": "test"
       }
     ]
   },
