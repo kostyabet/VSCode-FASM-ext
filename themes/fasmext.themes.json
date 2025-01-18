@@ -1,13 +1,13 @@
 {
-    "name": "FASM Theme",
-    "type": "dark",
-    "colors": {},
-    "tokenColors": [
-      {
-        "scope": "keyword.abs.instractions",
-        "settings": {
-          "foreground": "#d9d971"
-        }
+  "name": "FASM Theme",
+  "type": "dark",
+  "colors": {},
+  "tokenColors": [
+    {
+      "scope": "keyword.highlights.instractions",
+      "settings": {
+        "foreground": "#d9d971"
       }
-    ]
-  }
+    }
+  ]
+}
