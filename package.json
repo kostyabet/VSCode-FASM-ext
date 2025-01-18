@@ -12,18 +12,30 @@
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
-    "commands": [
+    "themes": [
       {
-        "command": "fasmext.helloWorld",
-        "title": "Hello World"
-      },
+        "label": "FASM Theme",
+        "uiTheme": "vs-dark",
+        "path": "./themes/fasmext.themes.json"
+      }
+    ],
+    "languages": [
       {
-        "command": "fasmext.goida",
-        "title": "Goida"
-      },
+        "id": "fasm",
+        "extensions": [".asm"],
+        "aliases": ["fasm", "FlatASM"],
+        "filenames": [],
+        "icon": {
+          "light": "./icons/fasm.png",
+          "dark": "./icons/fasm.png"
+        }
+      }
+    ],
+    "grammars": [
       {
-        "command": "fasmext.test",
-        "title": "test"
+        "language": "fasm",
+        "scopeName": "fasmext.instractions",
+        "path": "./syntaxes/instractions.tmGrammar.json"
       }
     ]
   },
