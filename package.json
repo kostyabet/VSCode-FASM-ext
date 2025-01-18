@@ -23,6 +23,13 @@
           "dark": "./icons/fasm.png"
         }
       }
+    ],
+    "grammars": [
+      {
+        "language": "fasm",
+        "scopeName": "fasmext.instractions",
+        "path": "./syntaxes/instractions.tmGrammar.json"
+      }
     ]
   },
   "scripts": {

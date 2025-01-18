@@ -1,0 +1,9 @@
+{
+    "scopeName": "fasmext.instractions",
+    "patterns": [
+        {
+            "name": "keyword.abs.instractions",
+            "match": "\\babs\\b"
+        }
+    ]
+}
