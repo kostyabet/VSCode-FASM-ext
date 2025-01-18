@@ -12,10 +12,16 @@
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
-    "commands": [
+    "languages": [
       {
-        "command": "fasmext.helloWorld",
-        "title": "Hello World"
+        "id": "fasm",
+        "extensions": [".asm"],
+        "aliases": ["fasm", "FlatASM"],
+        "filenames": [],
+        "icon": {
+          "light": "./icons/fasm.png",
+          "dark": "./icons/fasm.png"
+        }
       }
     ]
   },
