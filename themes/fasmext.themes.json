@@ -1,12 +1,23 @@
 {
   "name": "FASM Theme",
-  "type": "dark",
-  "colors": {},
+  "type": "vs",  
   "tokenColors": [
     {
       "scope": "keyword.highlights.instractions",
       "settings": {
-        "foreground": "#d9d971"
+        "foreground": "#FF0000" 
+      }
+    },
+    {
+      "scope": "keyword.highlights.macros",
+      "settings": {
+        "foreground": "#0000FF"
+      }
+    },
+    {
+      "scope": "keyword.highlights.registers",
+      "settings": {
+        "foreground": "#FFFF00"
       }
     }
   ]
