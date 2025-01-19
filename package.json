@@ -4,7 +4,7 @@
   "publisher": "MuhinBetenyaInc",
   "displayName": "vscode-fasm-ext",
   "description": "FASM language extension for visual studio code",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/kostyabet/VSCode-FASM-ext.git"
