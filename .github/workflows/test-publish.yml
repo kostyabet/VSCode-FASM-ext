@@ -1,0 +1,67 @@
+on:
+    push:
+        tags:
+            - 'v*'
+
+env:
+    NODE_VERSION: 20.18.0
+
+jobs:
+    build:
+        strategy:
+            matrix:
+                os: [macos-latest, ubuntu-22.04, windows-latest]
+        runs-on: ${{ matrix.os }}
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+            -   name: Install Node.js
+                uses: actions/setup-node@v4
+                with:
+                    node-version: ${{ env.NODE_VERSION }}
+            -   name: Install dependencies
+                run: npm install
+            -   name: Build if on Linux
+                run: xvfb-run -a npm run compile
+                if: runner.os == 'Linux'
+            -   name: Build if not on Linux
+                run: npm run compile
+                if: runner.os != 'Linux'
+
+    test:
+        needs: build
+        strategy:
+            matrix:
+                os: [macos-latest, ubuntu-22.04, windows-latest]
+        runs-on: ${{ matrix.os }}
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+            -   name: Install Node.js
+                uses: actions/setup-node@v4
+                with:
+                    node-version: ${{ env.NODE_VERSION }}
+            -   run: npm install
+            -   run: xvfb-run -a npm run compile
+                if: runner.os == 'Linux'
+            -   run: npm run compile
+                if: runner.os != 'Linux'
+
+    release:
+        needs: test
+        strategy:
+            matrix:
+                os: [ubuntu-22.04]
+        runs-on: ${{ matrix.os }}
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+            -   name: Install Node.js
+                uses: actions/setup-node@v4
+                with:
+                    node-version: ${{ env.NODE_VERSION }}
+            -   run: npm install
+            -   name: Publish
+                run: npm run deploy
+                env:
+                    VSCE_PAT: ${{ secrets.VSCE_PAT }}
