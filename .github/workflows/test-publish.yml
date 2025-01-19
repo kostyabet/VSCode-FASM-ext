@@ -61,7 +61,17 @@ jobs:
                 with:
                     node-version: ${{ env.NODE_VERSION }}
             -   run: npm install
-            -   name: Publish
+            -   name: Publish on Azure
                 run: npm run deploy
                 env:
                     VSCE_PAT: ${{ secrets.VSCE_PAT }}
+                    VERSION: ${{ env.VERSION }}
+            -   name: Create Release on GitHub
+                uses: softprops/action-gh-release@v1
+                with:
+                    tag_name: v${{ env.VERSION }}
+                    name: Release ${{ env.VERSION }}
+                    draft: false
+                    prerelease: false
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

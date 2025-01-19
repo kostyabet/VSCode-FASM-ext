@@ -1,9 +1,14 @@
 {
   "name": "fasmext",
+  "license": "MIT",
   "publisher": "MuhinBetenyaInc",
   "displayName": "vscode-fasm-ext",
   "description": "FASM language extension for visual studio code",
-  "version": "0.0.1",
+  "version": "0.0.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kostyabet/VSCode-FASM-ext.git"
+  },
   "engines": {
     "vscode": "^1.96.0"
   },
@@ -71,5 +76,8 @@
     "typescript": "^5.7.2",
     "webpack": "^5.95.0",
     "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "yarn": "^1.22.22"
   }
 }
