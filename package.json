@@ -1,5 +1,6 @@
 {
   "name": "fasmext",
+  "publisher": "MuhinBetenyaInc",
   "displayName": "vscode-fasm-ext",
   "description": "FASM language extension for visual studio code",
   "version": "0.0.1",
