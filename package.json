@@ -1,6 +1,7 @@
 {
   "name": "fasmext",
   "license": "MIT",
+  "icon": "icons/fasm.png",
   "publisher": "MuhinBetenyaInc",
   "displayName": "FASM extension",
   "description": "FASM language extension for visual studio code",
