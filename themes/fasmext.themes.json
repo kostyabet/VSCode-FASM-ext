@@ -15,6 +15,12 @@
       }
     },
     {
+      "scope": "keyword.highlights.macros2",
+      "settings": {
+        "foreground": "#0000FF"
+      }
+    },
+    {
       "scope": "keyword.highlights.registers",
       "settings": {
         "foreground": "#FFFF00"
