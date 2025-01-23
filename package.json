@@ -16,13 +16,15 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onLanguage:fasm",
+    "onFileSystem:*.asm"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "themes": [
       {
         "label": "FASM Theme",
-        "uiTheme": "vs-dark",
         "path": "./themes/fasmext.themes.json"
       }
     ],

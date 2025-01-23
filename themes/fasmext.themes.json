@@ -1,13 +1,30 @@
 {
-    "name": "FASM Theme",
-    "type": "dark",
-    "colors": {},
-    "tokenColors": [
-      {
-        "scope": "keyword.abs.instractions",
-        "settings": {
-          "foreground": "#d9d971"
-        }
+  "name": "FASM Theme",
+  "type": "vs",  
+  "tokenColors": [
+    {
+      "scope": "keyword.highlights.instractions",
+      "settings": {
+        "foreground": "#FF0000" 
       }
-    ]
-  }
+    },
+    {
+      "scope": "keyword.highlights.macros",
+      "settings": {
+        "foreground": "#0000FF"
+      }
+    },
+    {
+      "scope": "keyword.highlights.macros2",
+      "settings": {
+        "foreground": "#0000FF"
+      }
+    },
+    {
+      "scope": "keyword.highlights.registers",
+      "settings": {
+        "foreground": "#FFFF00"
+      }
+    }
+  ]
+}
