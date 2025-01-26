@@ -8,8 +8,8 @@
 <h3>Extension for <a href="https://code.visualstudio.com/">VSCode</a> for more convenient programming on <a href="https://flatassembler.net/">FlatASM</a>.</h3>
 
 ## Features
-- Code highlighting:
-    - _(in progress...)_
+- Code highlighting:</br>
+    <img src="https://i.ibb.co/4Vtwz9z/highlight.png" width="400">
 - Build / Run / Debug:
     - _(in progress...)_
 
