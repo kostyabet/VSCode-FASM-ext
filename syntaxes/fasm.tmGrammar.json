@@ -14,8 +14,8 @@
         "plain_string": {
             "patterns": [
                 {
-                    "name": "entity.name.label.string.fasm",
-                     "match": "\\b[a-zA-Z][a-zA-Z_]*\\b"
+                    "name": "constant.language.fasm",
+                     "match": "\\b[A-Za-z_.][A-Za-z0-9_.]*\\b"
                 }
             ]
         },
@@ -54,8 +54,8 @@
       "labels": {
         "patterns": [
           {     
-            "name": "entity.name.label.fasm",
-            "match": "^[A-Za-z_][A-Za-z0-9_]*:"
+            "name": "constant.language.fasm",
+            "match": "\\b[A-Za-z_.][A-Za-z0-9_.]*:"
           }
         ]
       },
