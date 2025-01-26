@@ -16,26 +16,17 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onFileSystem:*.asm"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
-    "themes": [
-      {
-        "label": "FASM Theme",
-        "uiTheme": "vs-dark",
-        "path": "./themes/fasmext.themes.json"
-      }
-    ],
     "languages": [
       {
         "id": "fasm",
-        "extensions": [
-          ".asm"
-        ],
-        "aliases": [
-          "fasm",
-          "FlatASM"
-        ],
+        "aliases": ["Flat Assembler", "fasm"],
+        "extensions": [".asm"],
+        "configuration": "./language-configuration.json",
         "filenames": [],
         "icon": {
           "light": "./icons/fasm.png",
@@ -46,11 +37,11 @@
     "grammars": [
       {
         "language": "fasm",
-        "scopeName": "fasmext.instractions",
-        "path": "./syntaxes/instractions.tmGrammar.json"
+        "scopeName": "source.fasm",
+        "path": "./syntaxes/fasm.tmGrammar.json"
       }
     ]
-  },
+  },  
   "scripts": {
     "vscode:prepublish": "npm run package",
     "compile": "webpack",

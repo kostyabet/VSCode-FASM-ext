@@ -1,6 +1,6 @@
 # FASM ext - FlatASM language extension
 
-<img src="https://board.flatassembler.net/images/fasm.png" width="50">
+<img src="https://i.ibb.co/dP2KRZs/fasm.png" width="50">
 
 ![Static Badge](https://img.shields.io/badge/Node_Js-20.18.0-2354cc)
 ![Static Badge](https://img.shields.io/badge/npm-10.8.2-707d9c)
@@ -8,8 +8,8 @@
 <h3>Extension for <a href="https://code.visualstudio.com/">VSCode</a> for more convenient programming on <a href="https://flatassembler.net/">FlatASM</a>.</h3>
 
 ## Features
-- Code highlighting:
-    - _(in progress...)_
+- Code highlighting:</br>
+    <img src="https://i.ibb.co/4Vtwz9z/highlight.png" width="400">
 - Build / Run / Debug:
     - _(in progress...)_
 
