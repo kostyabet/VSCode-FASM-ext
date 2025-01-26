@@ -1,6 +1,6 @@
 # FASM ext - FlatASM language extension
 
-<img src="https://board.flatassembler.net/images/fasm.png" width="50">
+<img src="https://i.ibb.co/dP2KRZs/fasm.png" width="50">
 
 ![Static Badge](https://img.shields.io/badge/Node_Js-20.18.0-2354cc)
 ![Static Badge](https://img.shields.io/badge/npm-10.8.2-707d9c)
