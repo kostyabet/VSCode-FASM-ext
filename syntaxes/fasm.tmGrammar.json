@@ -7,9 +7,18 @@
       { "include": "#numbers" },
       { "include": "#labels" },
       { "include": "#strings" },
-      { "include": "#macros" }
+      { "include": "#macros" },
+      { "include": "#plain_string"}
     ],
     "repository": {
+        "plain_string": {
+            "patterns": [
+                {
+                    "name": "entity.name.label.string.fasm",
+                     "match": "\\b[a-zA-Z][a-zA-Z_]*\\b"
+                }
+            ]
+        },
       "comments": {
         "patterns": [
           {
@@ -44,7 +53,7 @@
       },
       "labels": {
         "patterns": [
-          {
+          {     
             "name": "entity.name.label.fasm",
             "match": "^[A-Za-z_][A-Za-z0-9_]*:"
           }
@@ -73,5 +82,6 @@
         }
       ]
     }
+ 
     }
   }
