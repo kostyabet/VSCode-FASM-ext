@@ -51,6 +51,12 @@
         "scopeName": "fasmext.instractions",
         "path": "./syntaxes/instractions.tmGrammar.json"
       }
+    ],
+    "commands": [
+      {
+        "command": "extension.highlightLoops",
+        "title": "Highlight Loops"
+      }
     ]
   },
   "scripts": {
