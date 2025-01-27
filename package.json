@@ -33,6 +33,10 @@
         }
       }
     ],
+    "completionItemProvider": {
+      "language": "fasm",
+      "provider": "fasmCompletionProvider"
+    },
     "grammars": [
       {
         "language": "fasm",
