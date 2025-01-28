@@ -20,12 +20,9 @@
     "onCommand:fasm.createConfigs",
     "onCommand:fasm.run"
   ],
+  "files": ["bin/**"],
   "main": "./dist/extension.js",
   "contributes": {
-    "icons": {
-      "light": "./images/playIcon.png",
-       "dark": "./images/playIcon.png"
-      },
         "configuration": {
             "title": "FASM",
             "properties": {

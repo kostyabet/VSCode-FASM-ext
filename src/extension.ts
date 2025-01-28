@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import { execFile } from 'child_process';
 
 let runStatusBarItem: vscode.StatusBarItem;
 let currentMode: 'run' | 'debug' = 'run';
@@ -48,20 +49,27 @@ export function activate(context: vscode.ExtensionContext) {
             if (!fs.existsSync(tasksPath)) {
                 fs.writeFileSync(tasksPath, JSON.stringify({
                     "version": "2.0.0",
-                    "tasks": [{
-                        "label": "Build FASM",
-                        "type": "shell",
-                        "command": "${config:fasm.assemblerPath}",
-                        "args": [
-                            "${file}",
-                            "${fileDirname}/${fileBasenameNoExtension}.exe"
-                        ],
-                        "group": "build",
-                        "problemMatcher": []
-                    }]
+                    "tasks": [
+                        {
+                            "label": "Build FASM",
+    "type": "shell",
+    "command": "${config:fasm.assemblerPath}",
+    "args": [
+        "${file}",
+        "${fileDirname}/${fileBasenameNoExtension}.exe"
+    ],
+    "group": "build",
+    "problemMatcher": [],
+    "options": {
+        "env": {
+            "INCLUDE": "C:/FASM/INCLUDE/"
+        }
+                        }
+                        }
+                    ]
                 }, null, 2));
             }
-
+            
             const launchPath = path.join(vscodeDir, 'launch.json');
             if (!fs.existsSync(launchPath)) {
                 fs.writeFileSync(launchPath, JSON.stringify({
@@ -130,13 +138,40 @@ export function activate(context: vscode.ExtensionContext) {
             }
         }
     
-        try {
-            await vscode.commands.executeCommand('workbench.action.tasks.runTask', 'Build FASM');
-            await new Promise(resolve => setTimeout(resolve, 1000)); 
-            await vscode.commands.executeCommand('workbench.action.debug.start');
-        } catch (error) {
-            vscode.window.showErrorMessage(`Run failed: ${error}`);
+        const programPath = path.join(context.extensionPath, 'bin', 'ollydbg.exe');
+    if (!fs.existsSync(programPath)) {
+        vscode.window.showErrorMessage(`OllyDbg not found at: ${programPath}`);
+        return;
+    }
+
+    
+    const activeFile = vscode.window.activeTextEditor?.document.fileName;
+    if (!activeFile || !activeFile.endsWith('.asm')) {
+        vscode.window.showErrorMessage('No FASM file open for debugging.');
+        return;
+    }
+
+    const outputExecutable = path.join(
+        path.dirname(activeFile),
+        `${path.basename(activeFile, '.asm')}.exe`
+    );
+
+    if (!fs.existsSync(outputExecutable)) {
+        vscode.window.showErrorMessage('Executable file not found. Please build the project first.');
+        return;
+    }
+
+    execFile(programPath, [outputExecutable], (error, stdout, stderr) => {
+        if (error) {
+            vscode.window.showErrorMessage(`Error launching OllyDbg: ${error.message}`);
+            return;
         }
+        if (stderr) {
+            vscode.window.showWarningMessage(`Warning: ${stderr}`);
+        }
+        vscode.window.showInformationMessage(`OllyDbg launched for file: ${outputExecutable}`);
+    });
+
       });
 
     const runCommand = vscode.commands.registerCommand('fasm.run', async () => {
