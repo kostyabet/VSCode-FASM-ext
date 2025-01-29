@@ -1,7 +1,9 @@
+
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { execFile } from 'child_process';
+const { exec } = require('child_process');
 
 let runStatusBarItem: vscode.StatusBarItem;
 let currentMode: 'run' | 'debug' = 'run';
@@ -31,65 +33,66 @@ export function activate(context: vscode.ExtensionContext) {
             return completionItems;
         }
     });
-
+    
+    let configuredFilePath: string | undefined;
+    
     const createConfigsCommand = vscode.commands.registerCommand('fasm.createConfigs', async () => {
         const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
         if (!workspaceFolder) {
             vscode.window.showErrorMessage('No workspace folder open!');
             return;
         }
-
+    
         const vscodeDir = path.join(workspaceFolder, '.vscode');
         if (!fs.existsSync(vscodeDir)) {
             fs.mkdirSync(vscodeDir);
         }
-
+    
+        const activeFile = vscode.window.activeTextEditor?.document.fileName;
+        if (!activeFile) {
+            vscode.window.showErrorMessage('No active FASM file!');
+            return;
+        }
+        
+        const parsedPath = path.parse(activeFile);
+        const outputExecutable = path.join(parsedPath.dir, parsedPath.name + '.exe');
+        
+    
         try {
             const tasksPath = path.join(vscodeDir, 'tasks.json');
-            if (!fs.existsSync(tasksPath)) {
-                fs.writeFileSync(tasksPath, JSON.stringify({
-                    "version": "2.0.0",
-                    "tasks": [
-                        {
-                            "label": "Build FASM",
-    "type": "shell",
-    "command": "${config:fasm.assemblerPath}",
-    "args": [
-        "${file}",
-        "${fileDirname}/${fileBasenameNoExtension}.exe"
-    ],
-    "group": "build",
-    "problemMatcher": [],
-    "options": {
-        "env": {
-            "INCLUDE": "C:/FASM/INCLUDE/"
-        }
+    
+            const tasksConfig = {
+                version: "2.0.0",
+                tasks: [
+                    {
+                        label: "Build FASM",
+                        type: "shell",
+                        command: "${config:fasm.assemblerPath}",
+                        args: [
+                            activeFile, 
+                            outputExecutable
+                        ],
+                        group: "build",
+                        problemMatcher: [],
+                        options: {
+                            env: {
+                                INCLUDE: "C:/FASM/INCLUDE/"
+                            }
                         }
-                        }
-                    ]
-                }, null, 2));
-            }
-            
-            const launchPath = path.join(vscodeDir, 'launch.json');
-            if (!fs.existsSync(launchPath)) {
-                fs.writeFileSync(launchPath, JSON.stringify({
-                    "version": "0.2.0",
-                    "configurations": [{
-                        "name": "Run FASM",
-                        "type": process.platform === 'win32' ? 'cppvsdbg' : 'cppdbg',
-                        "request": "launch",
-                        "program": "${fileDirname}/${fileBasenameNoExtension}.exe",
-                        "preLaunchTask": "Build FASM",
-                        "externalConsole": true
-                    }]
-                }, null, 2));
-            }
-
-            vscode.window.showInformationMessage('FASM configs created!');
+                    }
+                ],
+                activeFilePath: activeFile,
+                executionFilePath: outputExecutable
+            };
+    
+            fs.writeFileSync(tasksPath, JSON.stringify(tasksConfig, null, 2));
+    
+            vscode.window.showInformationMessage(`FASM configs created for: ${activeFile}`);
         } catch (error) {
             vscode.window.showErrorMessage(`Error creating configs: ${error}`);
         }
     });
+    
 
     if (vscode.window.activeTextEditor?.document.languageId === 'fasm') {
         checkAndCreateConfigs();
@@ -124,58 +127,32 @@ export function activate(context: vscode.ExtensionContext) {
 
     const debugCommand = vscode.commands.registerCommand('fasm.debug', async () => {
         vscode.window.showInformationMessage('Debugging FASM...');
-        if (!isWorkspaceConfigured()) {
-            const choice = await vscode.window.showInformationMessage(
-                'Workspace is not configured. Do you want to configure it now?',
-                'Yes', 'No'
-            );
-    
-            if (choice === 'Yes') {
-                await vscode.commands.executeCommand('fasm.createConfigs');
-                return; 
-            } else {
-                return; 
-            }
-        }
-    
+        
         const programPath = path.join(context.extensionPath, 'bin', 'ollydbg.exe');
     if (!fs.existsSync(programPath)) {
         vscode.window.showErrorMessage(`OllyDbg not found at: ${programPath}`);
         return;
     }
 
-    
-    const activeFile = vscode.window.activeTextEditor?.document.fileName;
-    if (!activeFile || !activeFile.endsWith('.asm')) {
-        vscode.window.showErrorMessage('No FASM file open for debugging.');
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    if (!workspaceFolder) return;
+
+    const tasksPath = path.join(workspaceFolder, '.vscode', 'tasks.json');
+    if (!fs.existsSync(tasksPath)) {
+        vscode.window.showErrorMessage('tasks.json не найден.');
         return;
     }
 
-    const outputExecutable = path.join(
-        path.dirname(activeFile),
-        `${path.basename(activeFile, '.asm')}.exe`
-    );
+    const tasksConfig = JSON.parse(fs.readFileSync(tasksPath, 'utf-8'));
+    const outputExecutable = tasksConfig.executionFilePath;
 
-    if (!fs.existsSync(outputExecutable)) {
-        vscode.window.showErrorMessage('Executable file not found. Please build the project first.');
-        return;
-    }
-
-    execFile(programPath, [outputExecutable], (error, stdout, stderr) => {
-        if (error) {
-            vscode.window.showErrorMessage(`Error launching OllyDbg: ${error.message}`);
-            return;
-        }
-        if (stderr) {
-            vscode.window.showWarningMessage(`Warning: ${stderr}`);
-        }
-        vscode.window.showInformationMessage(`OllyDbg launched for file: ${outputExecutable}`);
-    });
+    execFile(programPath, [outputExecutable]);
 
       });
 
     const runCommand = vscode.commands.registerCommand('fasm.run', async () => {
         vscode.window.showInformationMessage('Running FASM...');
+    
         if (!isWorkspaceConfigured()) {
             const choice = await vscode.window.showInformationMessage(
                 'Workspace is not configured. Do you want to configure it now?',
@@ -184,25 +161,72 @@ export function activate(context: vscode.ExtensionContext) {
     
             if (choice === 'Yes') {
                 await vscode.commands.executeCommand('fasm.createConfigs');
-                return; 
-            } else {
-                return; 
             }
+            return; 
         }
     
         try {
-            await vscode.commands.executeCommand('workbench.action.tasks.runTask', 'Build FASM');
-            await new Promise(resolve => setTimeout(resolve, 1000)); 
-            await vscode.commands.executeCommand('workbench.action.debug.start');
+            const buildTask = (await vscode.tasks.fetchTasks()).find(task => task.name === 'Build FASM');
+            if (!buildTask) {
+                vscode.window.showErrorMessage('Build FASM task not found.');
+                return;
+            }
+    
+            const execution = await vscode.tasks.executeTask(buildTask);
+            let buildSuccess = false;
+    
+            await new Promise<void>((resolve) => {
+                const disposable = vscode.tasks.onDidEndTaskProcess(e => {
+                    if (e.execution === execution) {
+                        if (e.exitCode === 0) {
+                            buildSuccess = true;
+                        }
+                        disposable.dispose();
+                        resolve();
+                    }
+                });
+            });
+    
+            if (!buildSuccess) {
+                vscode.window.showErrorMessage('Build failed. Run aborted.');
+                return;
+            }
+ 
         } catch (error) {
             vscode.window.showErrorMessage(`Run failed: ${error}`);
         }
+
+        const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+        if (!workspaceFolder) return;
+    
+        const tasksPath = path.join(workspaceFolder, '.vscode', 'tasks.json');
+        const tasksConfig = JSON.parse(fs.readFileSync(tasksPath, 'utf-8'));
+        const outputExecutable =  tasksConfig.executionFilePath;
+        
+        exec(outputExecutable);
+
     });
+    
 
     context.subscriptions.push(debugCommand, showDropdownCommand, runCommand, provider, createConfigsCommand);
 
 }
 
+async function getExecutionFilePath(): Promise<string | undefined> {
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    if (!workspaceFolder) return;
+
+    const tasksPath = path.join(workspaceFolder, '.vscode', 'tasks.json');
+    if (!fs.existsSync(tasksPath)) {
+        vscode.window.showErrorMessage('tasks.json не найден.');
+        return;
+    }
+
+    const tasksConfig = JSON.parse(fs.readFileSync(tasksPath, 'utf-8'));
+
+    return tasksConfig.executionFilePath;
+       
+}
 
 async function checkAndCreateConfigs() {
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
@@ -232,7 +256,6 @@ function isWorkspaceConfigured(): boolean {
     if (!fs.existsSync(vscodeDir)) return false;
 
     const tasksPath = path.join(vscodeDir, 'tasks.json');
-    const launchPath = path.join(vscodeDir, 'launch.json');
 
-    return fs.existsSync(tasksPath) && fs.existsSync(launchPath);
+    return fs.existsSync(tasksPath);
 }
