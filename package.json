@@ -56,6 +56,19 @@
         "icon": "$(chevron-down)"
       }
   ],
+  "keybindings": [
+      {
+        "command": "fasm.run",
+        "key": "f5",
+        "when": "editorTextFocus && resourceExtname == '.asm'"
+      },
+      {
+        "command": "fasm.debug",
+        "key": "ctrl+f5",
+        "mac": "cmd+f5",
+        "when": "editorTextFocus && resourceExtname == '.asm'"
+      }
+    ],
   "menus": {
       "editor/title": [
     {
