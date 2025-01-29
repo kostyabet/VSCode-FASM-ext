@@ -17,10 +17,64 @@
     "Other"
   ],
   "activationEvents": [
-    "onFileSystem:*.asm"
+    "onLanguage:fasm",
+    "onCommand:fasm.createConfigs",
+    "onCommand:fasm.run"
   ],
+  "files": ["bin/**"],
   "main": "./dist/extension.js",
   "contributes": {
+        "configuration": {
+            "title": "FASM",
+            "properties": {
+                "fasm.assemblerPath": {
+                    "type": "string",
+                    "default": "fasm",
+                    "description": "Path to FASM assembler executable"
+                }
+            }
+        },  
+
+    "commands": [
+      {
+       "command": "fasm.createConfigs",
+            "title": "FASM: Create Build Configuration"
+      },
+      {
+        "command": "fasm.run",
+        "title": "Run FASM",
+        "icon": "$(play)"
+      },
+      {
+        "command": "fasm.debug",
+        "title": "Debug FASM",
+        "icon": "$(debug-alt)"
+      },
+      {
+        "command": "fasm.showDropdown",
+        "title": "Select Run/Debug",
+        "icon": "$(chevron-down)"
+      }
+  ],
+  "menus": {
+      "editor/title": [
+    {
+      "command": "fasm.run",
+      "group": "navigation",
+      "when": "editorLangId == fasm && fasm.mode.run"
+    },
+    {
+      "command": "fasm.debug",
+      "group": "navigation",
+      "when": "editorLangId == fasm && fasm.mode.debug"
+    },
+    {
+      "command": "fasm.showDropdown",
+      "group": "navigation@1", 
+      "when": "editorLangId == fasm "
+    }
+    ]
+    },
     "languages": [
       {
         "id": "fasm",
