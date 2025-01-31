@@ -21,7 +21,6 @@
     "onCommand:fasm.createConfigs",
     "onCommand:fasm.run"
   ],
-  "files": ["bin/**"],
   "main": "./dist/extension.js",
   "contributes": {
         "configuration": {
