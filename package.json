@@ -1,10 +1,11 @@
 {
   "name": "fasmext",
   "license": "MIT",
+  "icon": "icons/fasm.png",
   "publisher": "MuhinBetenyaInc",
-  "displayName": "vscode-fasm-ext",
+  "displayName": "FASM extension",
   "description": "FASM language extension for visual studio code",
-  "version": "0.0.2",
+  "version": "0.0.5",
   "repository": {
     "type": "git",
     "url": "https://github.com/kostyabet/VSCode-FASM-ext.git"
