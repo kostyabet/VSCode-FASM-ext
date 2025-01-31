@@ -23,21 +23,25 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
-        "configuration": {
-            "title": "FASM",
-            "properties": {
-                "fasm.assemblerPath": {
-                    "type": "string",
-                    "default": "fasm",
-                    "description": "Path to FASM assembler executable"
-                }
-            }
-        },  
-
+    "configuration": {
+      "title": "FASM",
+      "properties": {
+        "fasm.assemblerPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to folder with FASM assembler"
+        },
+        "fasm.includePath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to include  FASM folder"
+        }
+      }
+    },
     "commands": [
       {
-       "command": "fasm.createConfigs",
-            "title": "FASM: Create Build Configuration"
+        "command": "fasm.createConfigs",
+        "title": "FASM: Create Build Configuration"
       },
       {
         "command": "fasm.run",
@@ -54,8 +58,8 @@
         "title": "Select Run/Debug",
         "icon": "$(chevron-down)"
       }
-  ],
-  "keybindings": [
+    ],
+    "keybindings": [
       {
         "command": "fasm.run",
         "key": "f5",
@@ -68,30 +72,35 @@
         "when": "editorTextFocus && resourceExtname == '.asm'"
       }
     ],
-  "menus": {
+    "menus": {
       "editor/title": [
-    {
-      "command": "fasm.run",
-      "group": "navigation",
-      "when": "editorLangId == fasm && fasm.mode.run"
-    },
-    {
-      "command": "fasm.debug",
-      "group": "navigation",
-      "when": "editorLangId == fasm && fasm.mode.debug"
-    },
-    {
-      "command": "fasm.showDropdown",
-      "group": "navigation@1", 
-      "when": "editorLangId == fasm "
-    }
-    ]
+        {
+          "command": "fasm.run",
+          "group": "navigation",
+          "when": "editorLangId == fasm && fasm.mode.run"
+        },
+        {
+          "command": "fasm.debug",
+          "group": "navigation",
+          "when": "editorLangId == fasm && fasm.mode.debug"
+        },
+        {
+          "command": "fasm.showDropdown",
+          "group": "navigation@1",
+          "when": "editorLangId == fasm "
+        }
+      ]
     },
     "languages": [
       {
         "id": "fasm",
-        "aliases": ["Flat Assembler", "fasm"],
-        "extensions": [".asm"],
+        "aliases": [
+          "Flat Assembler",
+          "fasm"
+        ],
+        "extensions": [
+          ".asm"
+        ],
         "configuration": "./language-configuration.json",
         "filenames": [],
         "icon": {
@@ -111,7 +120,7 @@
         "path": "./syntaxes/fasm.tmGrammar.json"
       }
     ]
-  },  
+  },
   "scripts": {
     "vscode:prepublish": "npm run package",
     "compile": "webpack",
@@ -127,6 +136,7 @@
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
+    "@types/unzipper": "^0.10.10",
     "@types/vscode": "^1.96.0",
     "@typescript-eslint/eslint-plugin": "^8.17.0",
     "@typescript-eslint/parser": "^8.17.0",
@@ -140,6 +150,8 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
+    "tar": "^7.4.3",
+    "unzipper": "^0.12.3",
     "yarn": "^1.22.22"
   }
 }
