@@ -128,7 +128,7 @@ export function activate(context: vscode.ExtensionContext) {
     const debugCommand = vscode.commands.registerCommand('fasm.debug', async () => {
         vscode.window.showInformationMessage('Debugging FASM...');
         
-        const programPath = path.join(context.extensionPath, 'bin', 'ollydbg.exe');
+        const programPath = path.join(context.extensionPath, 'bin/ollydbg', 'ollydbg.exe');
     if (!fs.existsSync(programPath)) {
         vscode.window.showErrorMessage(`OllyDbg not found at: ${programPath}`);
         return;
