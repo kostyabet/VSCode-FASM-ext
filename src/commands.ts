@@ -6,6 +6,7 @@ import * as unzipper from "unzipper";
 import * as tar from "tar";
 import * as https from "https";
 import { execFile } from 'child_process';
+const { exec } = require('child_process');
 
 function getFasmDownloadUrl(): { url: string; filename: string; isZip: boolean } {
     const platform = os.platform();
@@ -220,8 +221,77 @@ async function debugCommand(extensionPath : string) {
     execFile(programPath, [outputExecutable]);
 }
 
+function isWorkspaceConfigured(): boolean {
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    if (!workspaceFolder) return false;
+
+    const vscodeDir = path.join(workspaceFolder, '.vscode');
+    if (!fs.existsSync(vscodeDir)) return false;
+
+    const tasksPath = path.join(vscodeDir, 'tasks.json');
+
+    return fs.existsSync(tasksPath);
+}
+
+async function runCommand() {
+    vscode.window.showInformationMessage('Running FASM...');
+        
+            if (!isWorkspaceConfigured()) {
+                const choice = await vscode.window.showInformationMessage(
+                    'Workspace is not configured. Do you want to configure it now?',
+                    'Yes', 'No'
+                );
+        
+                if (choice === 'Yes') {
+                    await vscode.commands.executeCommand('fasm.createConfigs');
+                }
+                return; 
+            }
+        
+            try {
+                const buildTask = (await vscode.tasks.fetchTasks()).find(task => task.name === 'Build FASM');
+                if (!buildTask) {
+                    vscode.window.showErrorMessage('Build FASM task not found.');
+                    return;
+                }
+        
+                const execution = await vscode.tasks.executeTask(buildTask);
+                let buildSuccess = false;
+        
+                await new Promise<void>((resolve) => {
+                    const disposable = vscode.tasks.onDidEndTaskProcess(e => {
+                        if (e.execution === execution) {
+                            if (e.exitCode === 0) {
+                                buildSuccess = true;
+                            }
+                            disposable.dispose();
+                            resolve();
+                        }
+                    });
+                });
+        
+                if (!buildSuccess) {
+                    vscode.window.showErrorMessage('Build failed. Run aborted.');
+                    return;
+                }
+     
+            } catch (error) {
+                vscode.window.showErrorMessage(`Run failed: ${error}`);
+            }
+    
+            const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+            if (!workspaceFolder) return;
+        
+            const tasksPath = path.join(workspaceFolder, '.vscode', 'tasks.json');
+            const tasksConfig = JSON.parse(fs.readFileSync(tasksPath, 'utf-8'));
+            const outputExecutable =  tasksConfig.executionFilePath;
+            
+            exec(outputExecutable);
+}
+
 export default {
     createConfigCommand, 
     showDropdownCommand,
-    debugCommand
+    debugCommand,
+    runCommand
 }
