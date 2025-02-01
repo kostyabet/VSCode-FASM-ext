@@ -5,7 +5,6 @@ import * as os from "os";
 import { execFile } from 'child_process';
 const { exec } = require('child_process');
 
-let runStatusBarItem: vscode.StatusBarItem;
 let currentMode: 'run' | 'debug' = 'run';
 
 import completitionProviderString from "./completion"
@@ -17,11 +16,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.executeCommand('setContext', 'fasm.mode.debug', false);
 
     // register regular expressions
-    const provider = vscode.languages.registerCompletionItemProvider('fasm', {
-        provideCompletionItems() {
-            return completitionProviderString();
-        }
-    });
+    const provider = vscode.languages.registerCompletionItemProvider('fasm', { provideCompletionItems() { return completitionProviderString() } });
     
     // register commands
     const createConfigsCommand = vscode.commands.registerCommand('fasm.createConfigs', async () => await commandsRegister());
