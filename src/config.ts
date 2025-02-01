@@ -19,6 +19,44 @@ async function checkAndCreateConfigs() {
     }
 }
 
+function createJson(vscodeDir : string, activeFile : string, outputExecutable : string) {
+    try {
+        const tasksPath = path.join(vscodeDir, 'tasks.json');
+            
+        const tasksConfig = {
+            version: "2.0.0",
+            tasks: [
+                {
+                    label: "Build FASM",
+                    type: "shell",
+                    command: "fasm",
+                    args: [
+                        activeFile, 
+                        outputExecutable
+                    ],
+                    group: "build",
+                    problemMatcher: [],
+                    options: {
+                        env: {
+                            FASM: "${config:fasm.assemblerPath}",
+                            INCLUDE: "${config:fasm.includePath}"
+                        }
+                    }
+                }
+            ],
+            activeFilePath: activeFile,
+            executionFilePath: outputExecutable
+        };
+            
+        fs.writeFileSync(tasksPath, JSON.stringify(tasksConfig, null, 2));
+            
+        vscode.window.showInformationMessage(`FASM configs created for: ${activeFile}`);
+    } catch (error) {
+        vscode.window.showErrorMessage(`Error creating configs: ${error}`);
+    }
+}
+
 export default {
-    checkAndCreateConfigs
+    checkAndCreateConfigs,
+    createJson
 }
