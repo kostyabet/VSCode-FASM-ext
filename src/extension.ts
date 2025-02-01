@@ -1,76 +1,19 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as os from "os";
-import { execFile } from 'child_process';
 const { exec } = require('child_process');
 
-let currentMode: 'run' | 'debug' = 'run';
-
 import completionProvider from "./completion"
-import commandsRegister from "./commands"
+import commands from "./commands"
 
 export function activate(context: vscode.ExtensionContext) {
+    // register buttons & provider
     const provider = completionProvider()
     
     // register commands
-    const createConfigsCommand = vscode.commands.registerCommand('fasm.createConfigs', async () => await commandsRegister());
-
-    if (vscode.window.activeTextEditor?.document.languageId === 'fasm') {
-        checkAndCreateConfigs();
-    }
-
-    let showDropdownCommand = vscode.commands.registerCommand('fasm.showDropdown', async () => {
-        const selected = await vscode.window.showQuickPick([
-            {
-                label: 'Run FASM',
-                description: 'Run the current FASM file',
-                command: 'fasm.run'
-            },
-            {
-                label: 'Debug FASM',
-                description: 'Debug the current FASM file',
-                command: 'fasm.debug'
-            }
-        ]);
-
-        if (selected) {
-            if (selected.command === 'fasm.run') {
-                currentMode = 'run';
-                vscode.commands.executeCommand('setContext', 'fasm.mode.run', true);
-                vscode.commands.executeCommand('setContext', 'fasm.mode.debug', false);
-            } else if (selected.command === 'fasm.debug') {
-                currentMode = 'debug';
-                vscode.commands.executeCommand('setContext', 'fasm.mode.run', false);
-                vscode.commands.executeCommand('setContext', 'fasm.mode.debug', true);
-            }
-        }
-    });
-
-    const debugCommand = vscode.commands.registerCommand('fasm.debug', async () => {
-        vscode.window.showInformationMessage('Debugging FASM...');
-        
-        const programPath = path.join(context.extensionPath, 'bin/ollydbg', 'ollydbg.exe');
-    if (!fs.existsSync(programPath)) {
-        vscode.window.showErrorMessage(`OllyDbg not found at: ${programPath}`);
-        return;
-    }
-
-    const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-    if (!workspaceFolder) return;
-
-    const tasksPath = path.join(workspaceFolder, '.vscode', 'tasks.json');
-    if (!fs.existsSync(tasksPath)) {
-        vscode.window.showErrorMessage('tasks.json не найден.');
-        return;
-    }
-
-    const tasksConfig = JSON.parse(fs.readFileSync(tasksPath, 'utf-8'));
-    const outputExecutable = tasksConfig.executionFilePath;
-
-    execFile(programPath, [outputExecutable]);
-
-      });
+    const createConfigCommand = vscode.commands.registerCommand('fasm.createConfigs', async () => await commands.createConfigCommand());
+    const showDropdownCommand = vscode.commands.registerCommand('fasm.showDropdown', async () => await commands.showDropdownCommand());
+    const debugCommand = vscode.commands.registerCommand('fasm.debug', async () => await commands.debugCommand(context.extensionPath));
 
     const runCommand = vscode.commands.registerCommand('fasm.run', async () => {
         vscode.window.showInformationMessage('Running FASM...');
@@ -129,9 +72,11 @@ export function activate(context: vscode.ExtensionContext) {
 
     });
     
+    if (vscode.window.activeTextEditor?.document.languageId === 'fasm') {
+        checkAndCreateConfigs();
+    }
 
-    context.subscriptions.push(debugCommand, showDropdownCommand, runCommand, provider, createConfigsCommand);
-
+    context.subscriptions.push(debugCommand, showDropdownCommand, runCommand, provider, createConfigCommand);
 }
 
 async function checkAndCreateConfigs() {

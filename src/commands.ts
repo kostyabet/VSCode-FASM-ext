@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import * as unzipper from "unzipper";
 import * as tar from "tar";
 import * as https from "https";
+import { execFile } from 'child_process';
 
 function getFasmDownloadUrl(): { url: string; filename: string; isZip: boolean } {
     const platform = os.platform();
@@ -155,7 +156,7 @@ function createJson(vscodeDir : string, activeFile : string, outputExecutable : 
     }
 }
 
-async function commandsRegister() {
+async function createConfigCommand() {
     installFasm()
     
     const folderStruct = checkWorkspaceFolder()
@@ -170,4 +171,57 @@ async function commandsRegister() {
     createJson(vscodeDir, activeFile, outputExecutable)
 }
 
-export default commandsRegister
+async function showDropdownCommand() {
+    const selected = await vscode.window.showQuickPick([
+        {
+            label: 'Run FASM',
+            description: 'Run the current FASM file',
+            command: 'fasm.run'
+        },
+        {
+            label: 'Debug FASM',
+            description: 'Debug the current FASM file',
+            command: 'fasm.debug'
+        }
+    ]);
+    
+    if (selected) {
+        if (selected.command === 'fasm.run') {
+            vscode.commands.executeCommand('setContext', 'fasm.mode.run', true);
+            vscode.commands.executeCommand('setContext', 'fasm.mode.debug', false);
+        } else if (selected.command === 'fasm.debug') {
+            vscode.commands.executeCommand('setContext', 'fasm.mode.run', false);
+            vscode.commands.executeCommand('setContext', 'fasm.mode.debug', true);
+        }
+    }
+}
+
+async function debugCommand(extensionPath : string) {
+    vscode.window.showInformationMessage('Debugging FASM...');
+            
+    const programPath = path.join(extensionPath, 'bin/ollydbg', 'ollydbg.exe');
+    if (!fs.existsSync(programPath)) {
+        vscode.window.showErrorMessage(`OllyDbg not found at: ${programPath}`);
+        return;
+    }
+    
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    if (!workspaceFolder) return;
+    
+    const tasksPath = path.join(workspaceFolder, '.vscode', 'tasks.json');
+    if (!fs.existsSync(tasksPath)) {
+        vscode.window.showErrorMessage('tasks.json не найден.');
+        return;
+    }
+    
+    const tasksConfig = JSON.parse(fs.readFileSync(tasksPath, 'utf-8'));
+    const outputExecutable = tasksConfig.executionFilePath;
+    
+    execFile(programPath, [outputExecutable]);
+}
+
+export default {
+    createConfigCommand, 
+    showDropdownCommand,
+    debugCommand
+}
