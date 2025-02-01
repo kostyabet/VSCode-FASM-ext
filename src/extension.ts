@@ -7,16 +7,11 @@ const { exec } = require('child_process');
 
 let currentMode: 'run' | 'debug' = 'run';
 
-import completitionProviderString from "./completion"
+import completionProvider from "./completion"
 import commandsRegister from "./commands"
 
 export function activate(context: vscode.ExtensionContext) {
-    // for buttons switch
-    vscode.commands.executeCommand('setContext', 'fasm.mode.run', true);
-    vscode.commands.executeCommand('setContext', 'fasm.mode.debug', false);
-
-    // register regular expressions
-    const provider = vscode.languages.registerCompletionItemProvider('fasm', { provideCompletionItems() { return completitionProviderString() } });
+    const provider = completionProvider()
     
     // register commands
     const createConfigsCommand = vscode.commands.registerCommand('fasm.createConfigs', async () => await commandsRegister());
@@ -137,22 +132,6 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(debugCommand, showDropdownCommand, runCommand, provider, createConfigsCommand);
 
-}
-
-async function getExecutionFilePath(): Promise<string | undefined> {
-    const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-    if (!workspaceFolder) return;
-
-    const tasksPath = path.join(workspaceFolder, '.vscode', 'tasks.json');
-    if (!fs.existsSync(tasksPath)) {
-        vscode.window.showErrorMessage('tasks.json не найден.');
-        return;
-    }
-
-    const tasksConfig = JSON.parse(fs.readFileSync(tasksPath, 'utf-8'));
-
-    return tasksConfig.executionFilePath;
-       
 }
 
 async function checkAndCreateConfigs() {

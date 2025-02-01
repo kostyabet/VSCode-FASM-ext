@@ -13,4 +13,13 @@ function completitionProviderString() {
     return completionItems;
 }
 
-export default completitionProviderString
+function completionProvider() {
+    // for buttons switch
+    vscode.commands.executeCommand('setContext', 'fasm.mode.run', true);
+    vscode.commands.executeCommand('setContext', 'fasm.mode.debug', false);
+
+    // register regular expressions
+    return vscode.languages.registerCompletionItemProvider('fasm', { provideCompletionItems() { return completitionProviderString() } });    
+}
+
+export default completionProvider
