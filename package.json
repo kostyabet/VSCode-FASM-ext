@@ -44,7 +44,7 @@
         "title": "FASM: Create Build Configuration"
       },
       {
-        "command": "fasm.run",
+        "command": "fasm.build",
         "title": "Run FASM",
         "icon": "$(play)"
       },
@@ -57,11 +57,21 @@
         "command": "fasm.showDropdown",
         "title": "Select Run/Debug",
         "icon": "$(chevron-down)"
+      },
+      {
+        "command": "fasm.run",
+        "title": "Run Exe",
+        "icon": "$(run-all)"
       }
     ],
     "keybindings": [
       {
         "command": "fasm.run",
+        "key": "f9",
+        "when": "editorTextFocus && resourceExtname == '.asm'"
+      },
+      {
+        "command": "fasm.build",
         "key": "f5",
         "when": "editorTextFocus && resourceExtname == '.asm'"
       },
@@ -76,6 +86,11 @@
       "editor/title": [
         {
           "command": "fasm.run",
+          "group": "navigation@3",
+          "when": "editorLangId"
+        },
+        {
+          "command": "fasm.build",
           "group": "navigation",
           "when": "editorLangId == fasm && fasm.mode.run"
         },
@@ -93,13 +108,20 @@
     },
     "languages": [
       {
+        "id": "asm",
+        "icon": {
+          "light": "./icons/fasm.png",
+          "dark": "./icons/fasm.png"
+        }
+      },
+      {
         "id": "fasm",
         "aliases": [
           "Flat Assembler",
           "fasm"
         ],
         "extensions": [
-          ".asm"
+          ".asm", ".ASM", ".inc", ".INC"
         ],
         "configuration": "./language-configuration.json",
         "filenames": [],

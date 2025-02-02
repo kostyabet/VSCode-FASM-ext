@@ -19,17 +19,18 @@ async function checkAndCreateConfigs() {
     }
 }
 
-function createJson(vscodeDir : string, activeFile : string, outputExecutable : string) {
+  
+function createJson(vscodeDir : string, activeFile : string, outputExecutable : string, debuggerPath: string) {
     try {
         const tasksPath = path.join(vscodeDir, 'tasks.json');
-            
+        const fasmPath = path.join("${config:fasm.assemblerPath}", "fasm.exe")  
         const tasksConfig = {
             version: "2.0.0",
             tasks: [
                 {
                     label: "Build FASM",
                     type: "shell",
-                    command: "fasm",
+                    command: fasmPath,
                     args: [
                         activeFile, 
                         outputExecutable
@@ -45,7 +46,8 @@ function createJson(vscodeDir : string, activeFile : string, outputExecutable : 
                 }
             ],
             activeFilePath: activeFile,
-            executionFilePath: outputExecutable
+            executionFilePath: outputExecutable,
+            debuggerFilePath: debuggerPath
         };
             
         fs.writeFileSync(tasksPath, JSON.stringify(tasksConfig, null, 2));

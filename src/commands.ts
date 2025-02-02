@@ -7,7 +7,29 @@ const { exec } = require('child_process');
 import config from "./config"
 import helper from "./helper"
 
+async function runCommand() {
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    if (!workspaceFolder) return;
+        
+    const tasksPath = path.join(workspaceFolder, '.vscode', 'tasks.json');
+    const tasksConfig = JSON.parse(fs.readFileSync(tasksPath, 'utf-8'));
+    const outputExecutable =  tasksConfig.executionFilePath;
+            
+    exec(outputExecutable);
+}
 async function createConfigCommand() {
+    const debuggerPath = await vscode.window.showInputBox({
+        prompt: "Enter the path to the debugger executable",
+        placeHolder: "For example: C:\\Program Files\\FASM\\debugger.exe"
+    });
+          
+    if (!debuggerPath) {
+        vscode.window.showWarningMessage("Configuration creation canceled (no debugger path provided).");
+        return null;
+    }
+          
+    if (!debuggerPath) return;
+
     helper.installFasm()
     
     const folderStruct = helper.checkWorkspaceFolder()
@@ -19,7 +41,7 @@ async function createConfigCommand() {
     const activeFile = pathStruct.file || "" // check for null string
     const outputExecutable = pathStruct.exec || "" // check for null string
 
-    config.createJson(vscodeDir, activeFile, outputExecutable)
+    config.createJson(vscodeDir, activeFile, outputExecutable, debuggerPath)
 }
 
 async function showDropdownCommand() {
@@ -48,31 +70,30 @@ async function showDropdownCommand() {
 }
 
 async function debugCommand(extensionPath : string) {
-    vscode.window.showInformationMessage('Debugging FASM...');
-            
-    const programPath = path.join(extensionPath, 'bin/ollydbg', 'ollydbg.exe');
-    if (!fs.existsSync(programPath)) {
-        vscode.window.showErrorMessage(`OllyDbg not found at: ${programPath}`);
-        return;
-    }
-    
+    vscode.window.showInformationMessage('Debugging...');
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
     if (!workspaceFolder) return;
-    
+
     const tasksPath = path.join(workspaceFolder, '.vscode', 'tasks.json');
     if (!fs.existsSync(tasksPath)) {
-        vscode.window.showErrorMessage('tasks.json не найден.');
+        vscode.window.showErrorMessage('tasks.json not found.');
         return;
     }
     
     const tasksConfig = JSON.parse(fs.readFileSync(tasksPath, 'utf-8'));
+    const debuggerPath = tasksConfig.debuggerFilePath;
     const outputExecutable = tasksConfig.executionFilePath;
     
-    execFile(programPath, [outputExecutable]);
+    if (!fs.existsSync(debuggerPath)) {
+        vscode.window.showErrorMessage(`debugger not found at: ${debuggerPath}`);
+        return;
+    }
+    
+    execFile(debuggerPath, [outputExecutable]);
 }
 
-async function runCommand() {
-    vscode.window.showInformationMessage('Running FASM...');
+async function buildCommand() {
+    vscode.window.showInformationMessage('Build FASM...');
         
     if (!helper.isWorkspaceConfigured()) {
         const choice = await vscode.window.showInformationMessage(
@@ -128,6 +149,7 @@ async function runCommand() {
 }
 
 export default {
+    buildCommand,
     createConfigCommand, 
     showDropdownCommand,
     debugCommand,
