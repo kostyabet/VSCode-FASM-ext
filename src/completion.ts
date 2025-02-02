@@ -19,7 +19,7 @@ function completionProvider() {
     vscode.commands.executeCommand('setContext', 'fasm.mode.debug', false);
 
     // register regular expressions
-    return vscode.languages.registerCompletionItemProvider('fasm', { provideCompletionItems() { return completitionProviderString() } });    
+    return vscode.languages.registerCompletionItemProvider('fasm', { provideCompletionItems() { return completitionProviderString() } });
 }
 
 export default completionProvider
