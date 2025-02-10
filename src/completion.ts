@@ -10,6 +10,12 @@ function completitionProviderString() {
         ...regExp.fasmMacros.map(macro => 
             new vscode.CompletionItem(macro, vscode.CompletionItemKind.Function))
     ];
+
+    const procCompletion = new vscode.CompletionItem('proc', vscode.CompletionItemKind.Keyword);
+    procCompletion.insertText = new vscode.SnippetString('proc ${1:name} uses ${2:registers}\n\t${3}\n\tret\nendp');
+
+    completionItems.push(procCompletion);
+
     return completionItems;
 }
 
