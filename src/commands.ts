@@ -17,36 +17,204 @@ async function runCommand() {
             
     exec(outputExecutable);
 }
+
+
 async function createConfigCommand() {
-    const debuggerPath = await vscode.window.showInputBox({
-        prompt: "Enter the path to the debugger executable",
-        placeHolder: "For example: C:\\Program Files\\FASM\\debugger.exe"
-    });
-          
-    if (!debuggerPath) {
-        vscode.window.showWarningMessage("Configuration creation canceled (no debugger path provided).");
+    const fasmChoice = await vscode.window.showQuickPick(
+        [
+            {
+                label: '$(cloud-download) Download FASM automatically',
+                description: 'Recommended for most users',
+                value: 'auto'
+            },
+            {
+                label: '$(folder) Use existing FASM installation',
+                description: 'I already have FASM installed',
+                value: 'manual'
+            },
+            {
+                label: '$(close) Skip FASM setup',
+                description: 'Configure later or use different assembler',
+                value: 'skip'
+            }
+        ],
+        {
+            placeHolder: 'How would you like to set up FASM assembler?',
+            ignoreFocusOut: true,
+            title: 'FASM Setup'
+        }
+    );
+    
+    if (!fasmChoice) {
+        vscode.window.showWarningMessage("Configuration creation canceled.");
         return null;
     }
-          
-    if (!debuggerPath) return;
-
-    helper.installFasm()
     
-    const folderStruct = helper.checkWorkspaceFolder()
-    if (!folderStruct.code) return // if error code
-    const vscodeDir = folderStruct.dir || "" // check for null string
+    let fasmPath = "";
+    let includePath = "";
+    
+    switch (fasmChoice.value) {
+        case 'auto':
+            vscode.window.showInformationMessage("Downloading and installing FASM...");
+            try {
+                await helper.installFasm();
+                const parentDir = path.dirname(__dirname);
+                fasmPath = path.join(parentDir, "bin", "fasm");
+                includePath = path.join(fasmPath, "include");
+            } catch (error) {
+                vscode.window.showErrorMessage(`Failed to install FASM.`);
+                const retry = await vscode.window.showWarningMessage(
+                    "FASM installation failed. Try manual setup?",
+                    "Yes", "No"
+                );
+                if (retry === "Yes") {
+                    fasmChoice.value = 'manual';
+                } else {
+                    return null;
+                }
+            }
+            break;
+            
+        case 'manual':
+            const manualPath = await vscode.window.showInputBox({
+                prompt: "Enter path to FASM executable directory",
+                placeHolder: "Example: C:\\Program Files\\FASM",
+                ignoreFocusOut: true
+            });
+            
+            if (manualPath === undefined) {
+                vscode.window.showWarningMessage("Configuration creation canceled.");
+                return null;
+            }
+            
+            fasmPath = manualPath || "";
+            
+            if (fasmPath) {
+                const useDefaultInclude = await vscode.window.showQuickPick(
+                    ['Yes, use default include path', 'No, specify custom path'],
+                    {
+                        placeHolder: `Use default include path (${path.join(fasmPath, 'include')})?`,
+                        ignoreFocusOut: true
+                    }
+                );
+                
+                if (useDefaultInclude === 'No, specify custom path') {
+                    const customIncludePath = await vscode.window.showInputBox({
+                        prompt: "Enter custom include path",
+                        placeHolder: "Example: C:\\Program Files\\FASM\\INCLUDE",
+                        ignoreFocusOut: true
+                    });
+                    includePath = customIncludePath || "";
+                } else {
+                    includePath = path.join(fasmPath, 'include');
+                }
+            }
+            break;
+            
+        case 'skip':
+            vscode.window.showInformationMessage("Skipping FASM setup. You can configure it later in settings.");
+            break;
+    }
+    
+    let debuggerPath = "";
+    
+    const debuggerChoice = await vscode.window.showQuickPick(
+        [
+            {
+                label: '$(debug) Configure debugger',
+                description: 'Set up debugger path',
+                value: 'configure'
+            },
+            {
+                label: '$(debug-step-over) Skip debugger',
+                description: 'Configure later or not needed',
+                value: 'skip'
+            }
+        ],
+        {
+            placeHolder: 'Would you like to configure a debugger?',
+            ignoreFocusOut: true,
+            title: 'Debugger Configuration'
+        }
+    );
+    
+    if (!debuggerChoice) {
+        vscode.window.showWarningMessage("Configuration creation canceled.");
+        return null;
+    }
+    
+    if (debuggerChoice.value === 'configure') {
+        const debuggerInput = await vscode.window.showInputBox({
+            prompt: "Enter path to debugger executable (optional)",
+            placeHolder: "Example: C:\\Program Files\\FASM\\debugger.exe",
+            ignoreFocusOut: true
+        });
+        
+        if (debuggerInput === undefined) {
+            vscode.window.showWarningMessage("Configuration creation canceled.");
+            return null;
+        }
+        
+        debuggerPath = debuggerInput || "";
+    }
+    
+    const folderStruct = helper.checkWorkspaceFolder();
+    if (!folderStruct.code) return;
+    const vscodeDir = folderStruct.dir || "";
 
-    const pathStruct = helper.workWithPath()
-    if (!pathStruct.code) return // if error code
-    const activeFile = pathStruct.file || "" // check for null string
-    const outputExecutable = pathStruct.exec || "" // check for null string
+    const pathStruct = helper.workWithPath();
+    if (!pathStruct.code) return;
+    const activeFile = pathStruct.file || "";
+    const outputExecutable = pathStruct.exec || "";
 
-    config.createJson(vscodeDir, activeFile, outputExecutable, debuggerPath)
+    try {
+        if (fasmPath) {
+            await vscode.workspace.getConfiguration().update(
+                'fasm.assemblerPath', 
+                fasmPath, 
+                vscode.ConfigurationTarget.Workspace
+            );
+        }
+        
+        if (includePath) {
+            await vscode.workspace.getConfiguration().update(
+                'fasm.includePath', 
+                includePath, 
+                vscode.ConfigurationTarget.Workspace
+            );
+        }
+        
+        config.createJson(vscodeDir, activeFile, outputExecutable, debuggerPath);
+        
+        let successMessage = "Configuration created successfully!";
+        if (!debuggerPath) {
+            successMessage += " (without debugger)";
+        }
+        if (fasmChoice.value === 'skip') {
+            successMessage += " - FASM not configured";
+        } else {
+            successMessage += ` - FASM ${fasmChoice.value === 'auto' ? 'installed' : 'configured'}`;
+        }
+        
+        vscode.window.showInformationMessage(successMessage);
+        
+        const openSettings = await vscode.window.showInformationMessage(
+            "Configuration complete. Would you like to review the settings?",
+            "Open Settings", "No Thanks"
+        );
+        
+        if (openSettings === "Open Settings") {
+            vscode.commands.executeCommand('workbench.action.openSettings', 'fasm');
+        }
+        
+    } catch (error) {
+        vscode.window.showErrorMessage(`Failed to create configuration.`);
+    }
 }
 
 async function showDropdownCommand() {
     const selected = await vscode.window.showQuickPick([
-        {
+        {   
             label: 'Run FASM',
             description: 'Run the current FASM file',
             command: 'fasm.run'
