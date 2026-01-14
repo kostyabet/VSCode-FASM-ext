@@ -20,7 +20,6 @@ async function runCommand() {
 
 
 async function createConfigCommand() {
-    // Шаг 1: Спросить про FASM
     const fasmChoice = await vscode.window.showQuickPick(
         [
             {
@@ -54,7 +53,6 @@ async function createConfigCommand() {
     let fasmPath = "";
     let includePath = "";
     
-    // Обработка выбора FASM
     switch (fasmChoice.value) {
         case 'auto':
             vscode.window.showInformationMessage("Downloading and installing FASM...");
@@ -78,7 +76,6 @@ async function createConfigCommand() {
             break;
             
         case 'manual':
-            // Запрашиваем путь к FASM вручную
             const manualPath = await vscode.window.showInputBox({
                 prompt: "Enter path to FASM executable directory",
                 placeHolder: "Example: C:\\Program Files\\FASM",
@@ -93,7 +90,6 @@ async function createConfigCommand() {
             fasmPath = manualPath || "";
             
             if (fasmPath) {
-                // Запрашиваем путь к include файлам (опционально)
                 const useDefaultInclude = await vscode.window.showQuickPick(
                     ['Yes, use default include path', 'No, specify custom path'],
                     {
@@ -120,7 +116,6 @@ async function createConfigCommand() {
             break;
     }
     
-    // Шаг 2: Настройка дебаггера
     let debuggerPath = "";
     
     const debuggerChoice = await vscode.window.showQuickPick(
@@ -163,7 +158,6 @@ async function createConfigCommand() {
         debuggerPath = debuggerInput || "";
     }
     
-    // Шаг 3: Настройка рабочего пространства
     const folderStruct = helper.checkWorkspaceFolder();
     if (!folderStruct.code) return;
     const vscodeDir = folderStruct.dir || "";
@@ -173,9 +167,7 @@ async function createConfigCommand() {
     const activeFile = pathStruct.file || "";
     const outputExecutable = pathStruct.exec || "";
 
-    // Сохраняем настройки в конфиг
     try {
-        // Обновляем настройки FASM в конфигурации VS Code
         if (fasmPath) {
             await vscode.workspace.getConfiguration().update(
                 'fasm.assemblerPath', 
@@ -192,10 +184,8 @@ async function createConfigCommand() {
             );
         }
         
-        // Создаем JSON конфиг для сборки
         config.createJson(vscodeDir, activeFile, outputExecutable, debuggerPath);
         
-        // Показываем итоговое сообщение
         let successMessage = "Configuration created successfully!";
         if (!debuggerPath) {
             successMessage += " (without debugger)";
@@ -208,7 +198,6 @@ async function createConfigCommand() {
         
         vscode.window.showInformationMessage(successMessage);
         
-        // Предложить открыть настройки
         const openSettings = await vscode.window.showInformationMessage(
             "Configuration complete. Would you like to review the settings?",
             "Open Settings", "No Thanks"
