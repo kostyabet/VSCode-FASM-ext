@@ -11,12 +11,14 @@
 - _`Code highlighting`_:</br>
     - Extension highlight `fasm`: </br>
         - macros `proc`;
+          </br><img src="https://i.ibb.co/rKX9SGYr/2026-01-14-17-19-57.jpg" width="200">
         - instractions (`mov`, `add`, `sub`, ...);
         - registers (`eax`, `ebx`, `edi`, ...);
         - strings (`'str'`, `"str"`, ...);
         - numbers (`0x123`, `010101b`, ...);
         - types of data (`db`, `dd`, `dw`, ...). </br> </br>
     <img src="https://i.ibb.co/4Vtwz9z/highlight.png" width="400"></br></br>
+          
 - _`Build & Run` / `Debug`_:
     - __`Build and Run`__: </br>
         - Build and run programm.</br>
