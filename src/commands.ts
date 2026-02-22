@@ -198,14 +198,6 @@ async function createConfigCommand() {
         
         vscode.window.showInformationMessage(successMessage);
         
-        const openSettings = await vscode.window.showInformationMessage(
-            "Configuration complete. Would you like to review the settings?",
-            "Open Settings", "No Thanks"
-        );
-        
-        if (openSettings === "Open Settings") {
-            vscode.commands.executeCommand('workbench.action.openSettings', 'fasm');
-        }
         
     } catch (error) {
         vscode.window.showErrorMessage(`Failed to create configuration.`);

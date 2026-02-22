@@ -23,6 +23,21 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "configuration": {
+      "title": "FASM",
+      "properties": {
+        "fasm.assemblerPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the FASM assembler directory"
+        },
+        "fasm.includePath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the FASM include directory"
+        }
+      }
+    },
     "commands": [
       {
         "command": "fasm.createConfigs",
@@ -87,7 +102,7 @@
         {
           "command": "fasm.showDropdown",
           "group": "navigation@1",
-          "when": "editorLangId == fasm "
+          "when": "editorLangId == fasm"
         }
       ]
     },
