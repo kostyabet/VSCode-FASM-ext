@@ -71,6 +71,17 @@
                 "match": "\\\\."
               }
             ]
+          },
+          {
+            "name": "string.quoted.single.fasm",
+            "begin": "'",
+            "end": "'",
+            "patterns": [
+              {
+                "name": "constant.character.escape.fasm",
+                "match": "\\\\."
+              }
+            ]
           }
         ]
       },
