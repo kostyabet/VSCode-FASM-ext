@@ -138,7 +138,7 @@ function workWithPath() {
     const activeFile = vscode.window.activeTextEditor?.document.fileName;
     if (!activeFile) {
         vscode.window.showErrorMessage('No active FASM file!');
-        return { code: 0, file: null, exec: null };
+        return { code: 0, file: null, exec: null, additionalExec: null };
     }
 
     const parsedPath = path.parse(activeFile);
@@ -150,7 +150,14 @@ function workWithPath() {
         outputExecutable = path.join(parsedPath.dir, parsedPath.name);
     }
 
-    return { code: 1, file: activeFile, exec: outputExecutable };
+    const rawExt = vscode.workspace.getConfiguration().get<string>('fasm.additionalOutputExtension', '').trim();
+    let additionalExec: string | null = null;
+    if (rawExt) {
+        const ext = rawExt.startsWith('.') ? rawExt : `.${rawExt}`;
+        additionalExec = path.join(parsedPath.dir, parsedPath.name + ext);
+    }
+
+    return { code: 1, file: activeFile, exec: outputExecutable, additionalExec };
 }
 
 

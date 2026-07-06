@@ -5,7 +5,7 @@
   "publisher": "MuhinBetenyaInc",
   "displayName": "FASM extension",
   "description": "FASM language extension for visual studio code",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/kostyabet/VSCode-FASM-ext.git"
@@ -35,6 +35,11 @@
           "type": "string",
           "default": "",
           "description": "Path to the FASM include directory"
+        },
+        "fasm.additionalOutputExtension": {
+          "type": "string",
+          "default": "",
+          "description": "Optional additional output extension (e.g. \"bin\"). When set, the build produces a second file with this extension alongside the primary output. Requires re-running \"FASM: Create Build Configuration\" after changing."
         }
       }
     },

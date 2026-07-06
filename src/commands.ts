@@ -166,6 +166,7 @@ async function createConfigCommand() {
     if (!pathStruct.code) return;
     const activeFile = pathStruct.file || "";
     const outputExecutable = pathStruct.exec || "";
+    const additionalOutput = pathStruct.additionalExec || null;
 
     try {
         if (fasmPath) {
@@ -184,7 +185,7 @@ async function createConfigCommand() {
             );
         }
         
-        config.createJson(vscodeDir, activeFile, outputExecutable, debuggerPath);
+        config.createJson(vscodeDir, activeFile, outputExecutable, debuggerPath, additionalOutput);
         
         let successMessage = "Configuration created successfully!";
         if (!debuggerPath) {

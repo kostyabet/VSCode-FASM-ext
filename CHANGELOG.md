@@ -4,6 +4,14 @@ All notable changes to the **FASM extension** for Visual Studio Code are documen
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] — 2026-07-06
+
+### Added
+- New optional `fasm.additionalOutputExtension` setting. When set (e.g. `"bin"`), the build produces a second output file with that extension alongside the primary `*.exe`, enabling workflows such as booting `format binary` sources in emulators like QEMU without manual renaming ([#22](https://github.com/kostyabet/VSCode-FASM-ext/issues/22)).
+
+### Changed
+- `Build FASM` task in `tasks.json` chains a platform-appropriate copy step (`copy /Y` on Windows, `cp -f` elsewhere) after `fasm` when the additional output extension is configured.
+
 ## [0.5.1] — 2026-07-06
 
 ### Added

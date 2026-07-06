@@ -36,11 +36,13 @@ In file `settings.json`:
 ```json
 {
     "fasm.assemblerPath": "c:\\Users\\divmone\\Documents\\dev\\VSCode-FASM-ext\\bin\\fasm",
-    "fasm.includePath": "c:\\Users\\divmone\\Documents\\dev\\VSCode-FASM-ext\\bin\\fasm\\include"
+    "fasm.includePath": "c:\\Users\\divmone\\Documents\\dev\\VSCode-FASM-ext\\bin\\fasm\\include",
+    "fasm.additionalOutputExtension": "bin"
 }
 ```
 > `assemblerPath` - path to the `fasm` folder</br>
-> `includePath` - path to the `include` folder in fasm compiller
+> `includePath` - path to the `include` folder in fasm compiller</br>
+> `additionalOutputExtension` - _optional_. When set (e.g. `"bin"`), the build produces a second output file with this extension alongside the primary `*.exe`. Useful for `format binary` sources (bootloaders, flat binaries) that you want to run in emulators such as QEMU. Leave empty to disable. After changing this value, re-run `FASM: Create Build Configuration` so `tasks.json` is regenerated.
 ### For debugger
 In file `task.json`:
 ```json
